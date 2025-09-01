@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Cadastro de E-mails</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    input, button { padding: 8px; margin: 5px 0; }
+    table { border-collapse: collapse; margin-top: 20px; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background: #f0f0f0; }
+  </style>
+</head>
+<body>
+  <h2>Cadastro de E-mails com Correção Automática</h2>
+  <input type="text" id="emailInput" placeholder="Digite seu e-mail">
+  <button onclick="cadastrarEmail()">Cadastrar</button>
+
+  <table id="tabelaEmails">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>E-mail Corrigido</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+<script>
+    let contador = 0;
+
+    function corrigirEmail(email) {
+        email = email.trim().toLowerCase();
+
+        // Correções básicas de substituições comuns
+        email = email
+            .replace(/\s+/g, "")               // remove espaços dentro
+            .replace(/\(at\)|\[at\]| at /g, "@") // substitui variações de "at"
+            .replace(/arroba/gi, "@")          // substitui todas ocorrências de "arroba"
+            .replace(/ponto/gi, ".");          // substitui "ponto" por "."
+
+        // Se começar com "arroba.", adiciona um nome fictício
+        if (email.startsWith("@")) {
+            email = "usuario" + email;
+        }
+
+        // Se faltar o @ (exemplo: "paulo-gmail.com")
+        if (!email.includes("@") && email.includes("gmail")) {
+            // tenta dividir antes de "gmail"
+            let usuario = email.split("gmail")[0].replace(/[-_.]$/, "");
+            email = usuario + "@gmail.com";
+        } else if (!email.includes("@")) {
+            // caso genérico
+            email = email + "@gmail.com";
+        } else {
+            // Normaliza qualquer domínio para gmail.com
+            let usuario = email.split("@")[0];
+            email = usuario + "@gmail.com";
+        }
+
+        return email;
+    }
+
+    function cadastrarEmail() {
+        let email = document.getElementById("emailInput").value;
+        if (!email) return alert("Digite um e-mail!");
+
+        let emailCorrigido = corrigirEmail(email);
+
+        contador++;
+        let tabela = document.querySelector("#tabelaEmails tbody");
+        let linha = `<tr><td>${contador}</td><td>${emailCorrigido}</td></tr>`;
+        tabela.innerHTML += linha;
+
+        document.getElementById("emailInput").value = "";
+    }
+</script>
+
+</body>
+</html>
